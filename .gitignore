@@ -1,6 +1,6 @@
 # global rules
 
-esp-open-sdk/
+esp-open-sdk/*
 
 .cfg
 *.d

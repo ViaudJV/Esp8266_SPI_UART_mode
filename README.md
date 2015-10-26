@@ -23,18 +23,8 @@ For Serial communications, the library has been tested with the direct USB seria
 
 ## Requirements
 
-you will need the latest version of the Arduino IDE:
-
-- [Arduino IDE 1.6.5](http://arduino.cc/en/main/software)
-
-### For WiFi using the ESP8266 chip
-
-To use the library with the ESP8266 WiFi chip you will need to install the required module from the Boards Manager of the Arduino IDE. These are the steps to install the ESP8266 package inside the Arduino IDE:
-
-1. Start the Arduino IDE and open the Preferences window
-2. Enter `http://arduino.esp8266.com/package_esp8266com_index.json` into the Additional Board Manager URLs field. You can add multiple URLs, separating them with commas.
-3. Open the Boards Manager from Tools > Board menu and install the esp8266 package (and after that don't forget to select your ESP8266 board from Tools > Board menu).
-
+you need the latest toolchain of pfalcon
+https://github.com/pfalcon/esp-open-sdk
 
 
 

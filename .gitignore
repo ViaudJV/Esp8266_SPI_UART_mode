@@ -1,4 +1,5 @@
 # global rules
+
 esp-open-sdk/
 
 .cfg

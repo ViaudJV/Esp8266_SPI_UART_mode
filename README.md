@@ -28,18 +28,17 @@ https://github.com/pfalcon/esp-open-sdk
 
 
 ## Dependances
--autoconf
--build-essential 
-
- - gperf
- - bison
- - flex
- - texinfo
- - libtool
- - libncurses5-dev 
- - wget
- - gawk
- - libc6-dev-amd64
- - python-serial
- - libexpat-dev unzip
+- autoconf
+- build-essential 
+- gperf
+- bison
+- flex
+- texinfo
+- libtool
+- libncurses5-dev 
+- wget
+- gawk
+- libc6-dev-amd64
+- python-serial
+- libexpat-dev unzip
 

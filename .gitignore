@@ -1,8 +1,5 @@
 # global rules
-
-obj
-bin
-doc/doxygen
+esp-open-sdk/
 
 .cfg
 *.d

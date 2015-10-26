@@ -15,7 +15,7 @@ The ESP8266_Transparent_SPI_UART_mode is designed to provide maximum of the band
 
 ### ESP8266
 
-The library is compatible with most of the ESP8266 modules & ESP8266 development boards.
+The src is compatible with most of the ESP8266 modules & ESP8266 development boards.
 
 ### Serial
 
@@ -23,9 +23,14 @@ For Serial communications, the library has been tested with the direct USB seria
 
 ## Requirements
 
-you need the latest toolchain of pfalcon
-https://github.com/pfalcon/esp-open-sdk
-
+you need the latest toolchain of pfalcon: https://github.com/pfalcon/esp-open-sdk
+and for flash the esp8266
+for debian distribution go to in esp-open-sdk directory
+```
+$ wget -O esptool_0.0.2-1_i386.deb https://github.com/esp8266/esp8266-wiki/raw/master/deb/esptool_0.0.2-1_i386.deb
+$ sudo dpkg -i esptool_0.0.2-1_i386.deb
+$ rm esptool_0.0.2-1_i386.deb
+```
 
 ## Dependances
 - autoconf

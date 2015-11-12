@@ -6,7 +6,7 @@
 #include "espconn.h"
 #include "user_interface.h"
 #include "user_config.h"
-
+#include "../driver/uart.h"
 
 
 void uart0_rx_intr_handler(void *para)
@@ -73,7 +73,7 @@ void user_init( void )
     wifi_set_opmode_current( STATION_MODE );
     gpio_init();
 //os_printf sur Uart0
-	os_install_putc1((void *)uart0_write_char_no_wait);
+
     uart0_tx_buffer("init", 4);
     config.bssid_set = 0;
     os_memcpy( &config.ssid, SSID, 32 );

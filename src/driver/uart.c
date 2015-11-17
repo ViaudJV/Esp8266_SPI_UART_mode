@@ -298,7 +298,8 @@ uart_recvTask(os_event_t *events)
 
             d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
             uart_tx_one_char(UART0, d_tmp);
-	    ProcessChar(d_tmp);
+	    
+	    ProcessChar(d_tmp,&MessageUart);
 
         }
 	
@@ -323,14 +324,17 @@ uart_init(UartBautRate uart0_br, UartBautRate uart1_br)
 {
     /*this is a example to process uart data from task,please change the priority to fit your application task if exists*/
     system_os_task(uart_recvTask, uart_recvTaskPrio, uart_recvTaskQueue, uart_recvTaskQueueLen);  //demo with a task to process the uart data
-    
+
     UartDev.baut_rate = uart0_br;
     uart_config(UART0);
     UartDev.baut_rate = uart1_br;
     uart_config(UART1);
     ETS_UART_INTR_ENABLE();
     
-    #if UART_BUFF_EN
+    os_memset(MessageUart,0x00,sizeof(MessageUart));
+
+
+ #if UART_BUFF_EN
     pTxBuffer = Uart_Buf_Init(UART_TX_BUFFER_SIZE);
     pRxBuffer = Uart_Buf_Init(UART_RX_BUFFER_SIZE);
     #endif

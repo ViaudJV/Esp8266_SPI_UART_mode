@@ -26,3 +26,4 @@ Module.markers
 *.mcs
 *.mcw
 .metadata
+/src/user/user_config.h

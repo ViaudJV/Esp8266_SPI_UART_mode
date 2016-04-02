@@ -68,13 +68,13 @@ void user_init( void )
     static struct station_config config;
     uart_div_modify( 0, UART_CLK_FREQ / ( 115200 ) );
     os_printf( "%s\n", __FUNCTION__ );
-    //uart_init(115200,9600);
+    uart_init(115200,9600);
     wifi_station_set_hostname( HOSTNAME );
     wifi_set_opmode_current( SOFTAP_MODE );
     gpio_init();
 //os_printf sur Uart0
 
-    //uart0_tx_buffer("init\n", 5);
+    uart0_tx_buffer("init\n", 5);
     config.bssid_set = 1;
     os_memcpy( &config.ssid, SSID, 14 );
     os_memcpy( &config.password, PASSWORD, 9 );

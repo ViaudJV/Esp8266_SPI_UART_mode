@@ -28,6 +28,11 @@ extern UartDevice    UartDev;
 LOCAL struct UartBuffer* pTxBuffer = NULL;
 LOCAL struct UartBuffer* pRxBuffer = NULL;
 
+
+
+
+
+
 /*uart demo with a system task, to output what uart receives*/
 /*this is a example to process uart data from task,please change the priority to fit your application task if exists*/
 /*it might conflict with your task, if so,please arrange the priority of different task,  or combine it to a different event in the same task. */
@@ -331,7 +336,6 @@ uart_init(UartBautRate uart0_br, UartBautRate uart1_br)
     uart_config(UART1);
     ETS_UART_INTR_ENABLE();
     
-    os_memset(MessageUart,0x00,sizeof(MessageUart));
 
 
  #if UART_BUFF_EN

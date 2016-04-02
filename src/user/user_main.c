@@ -19,14 +19,14 @@ void wifi_callback( System_Event_t *evt )
     os_printf( "%s: %d\n", __FUNCTION__, evt->event );
     
 		char toto[7] = "hello\n\0";
-		uart0_tx_buffer(toto, 7);
+		//uart0_tx_buffer(toto, 7);
     switch ( evt->event )
     {
         case EVENT_STAMODE_CONNECTED:
         {
 		
 		char toto[7] = "hello\n\0";
-		uart0_tx_buffer(toto, 7);
+		//uart0_tx_buffer(toto, 7);
 	   	os_printf("connect to ssid %s, channel %d\n",
 			evt->event_info.connected.ssid,
 			evt->event_info.connected.channel);
@@ -68,19 +68,21 @@ void user_init( void )
     static struct station_config config;
     uart_div_modify( 0, UART_CLK_FREQ / ( 115200 ) );
     os_printf( "%s\n", __FUNCTION__ );
-    uart_init(115200,9600);
+    //uart_init(115200,9600);
     wifi_station_set_hostname( HOSTNAME );
-    wifi_set_opmode_current( STATION_MODE );
+    wifi_set_opmode_current( SOFTAP_MODE );
     gpio_init();
 //os_printf sur Uart0
 
-    uart0_tx_buffer("init", 4);
-    config.bssid_set = 0;
-    os_memcpy( &config.ssid, SSID, 32 );
-    os_memcpy( &config.password, PASSWORD, 64 );
+    //uart0_tx_buffer("init\n", 5);
+    config.bssid_set = 1;
+    os_memcpy( &config.ssid, SSID, 14 );
+    os_memcpy( &config.password, PASSWORD, 9 );
     wifi_station_set_config( &config );
     wifi_station_connect();
-    wifi_set_event_handler_cb( wifi_callback );
+   // wifi_set_event_handler_cb( wifi_callback );
+
+
 
 }
 

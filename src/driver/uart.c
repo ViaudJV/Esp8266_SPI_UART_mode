@@ -22,6 +22,7 @@
 #include "mem.h"
 #include "os_type.h"
 #include "../user/commande.h"
+#include "../user/task.h"
 // UartDev is defined and initialized in rom code.
 extern UartDevice    UartDev;
 
@@ -284,8 +285,8 @@ uart_test_rx()
 }
 #endif
 
-uint8 i = 0;
 
+/*
 LOCAL void ICACHE_FLASH_ATTR ///////
 uart_recvTask(os_event_t *events)
 {
@@ -323,7 +324,7 @@ uart_recvTask(os_event_t *events)
     #endif
     }
 }
-
+*/
 void ICACHE_FLASH_ATTR
 uart_init(UartBautRate uart0_br, UartBautRate uart1_br)
 {

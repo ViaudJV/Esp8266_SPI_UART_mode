@@ -7,6 +7,7 @@
 #include "user_interface.h"
 #include "user_config.h"
 #include "../driver/uart.h"
+#include "../driver/spi.h"
 
 
 void uart0_rx_intr_handler(void *para)
@@ -69,6 +70,7 @@ void user_init( void )
     uart_div_modify( 0, UART_CLK_FREQ / ( 115200 ) );
     os_printf( "%s\n", __FUNCTION__ );
     uart_init(115200,9600);
+    spi_slave_init(HSPI,32);
     wifi_station_set_hostname( HOSTNAME );
     wifi_set_opmode_current( SOFTAP_MODE );
     gpio_init();

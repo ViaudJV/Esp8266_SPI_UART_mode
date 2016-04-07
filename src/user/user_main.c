@@ -8,7 +8,7 @@
 #include "user_config.h"
 #include "../driver/uart.h"
 #include "../driver/spi.h"
-
+#include "serverTCP.h"
 
 void uart0_rx_intr_handler(void *para)
 {
@@ -72,18 +72,19 @@ void user_init( void )
     uart_init(115200,9600);
     spi_slave_init(HSPI,32);
     wifi_station_set_hostname( HOSTNAME );
-    wifi_set_opmode_current( SOFTAP_MODE );
+    wifi_set_opmode_current( STATIONAP_MODE );
     gpio_init();
 //os_printf sur Uart0
 
     uart0_tx_buffer("init\n", 5);
     config.bssid_set = 1;
     os_memcpy( &config.ssid, SSID, 14 );
-    os_memcpy( &config.password, PASSWORD, 9 );
+    os_memcpy( &config.password, PASSWORD, 41);
     wifi_station_set_config( &config );
     wifi_station_connect();
    // wifi_set_event_handler_cb( wifi_callback );
-
+	shell_init();
+  //  user_set_station_config();
 
 
 }

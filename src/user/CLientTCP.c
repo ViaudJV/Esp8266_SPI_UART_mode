@@ -4,7 +4,7 @@
 #include "os_type.h"
 #include "ip_addr.h"
 #include "espconn.h"
-
+#include "clientTCP.h"
 #include "user_interface.h"
 #include "mem.h"
 
@@ -13,8 +13,7 @@
 
 #define packet_size   (2 * 1024)
 
-LOCAL os_timer_t test_timer;
-LOCAL struct espconn user_tcp_conn;
+os_timer_t test_timer;
 LOCAL struct _esp_tcp user_tcp;
 ip_addr_t tcp_server_ip;
 
@@ -93,7 +92,7 @@ LOCAL void ICACHE_FLASH_ATTR
 user_tcp_connect_cb(void *arg)
 {
     struct espconn *pespconn = arg;
-
+    user_conn = arg;
     os_printf("connect succeed !!! \r\n");
 
     espconn_regist_recvcb(pespconn, user_tcp_recv_cb);
@@ -234,20 +233,10 @@ user_check_ip(void)
     }
    else
    {
-       
- //       if ((wifi_station_get_connect_status() == STATION_WRONG_PASSWORD ||
- //               wifi_station_get_connect_status() == STATION_NO_AP_FOUND ||
- //               wifi_station_get_connect_status() == STATION_CONNECT_FAIL))
-  //      {
- //        os_printf("connect fail !!! \r\n");
- //       }
-  //    else
-  //    {
+
            //re-arm timer to check ip
-		os_printf("connect fail !!! \r\n");
             os_timer_setfn(&test_timer, (os_timer_func_t *)user_check_ip, NULL);
             os_timer_arm(&test_timer, 100, 0);
-  //      }
     }
 }
 

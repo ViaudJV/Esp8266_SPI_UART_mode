@@ -21,6 +21,10 @@ void ICACHE_FLASH_ATTR uart_recvTask(os_event_t *events)
         uint8 d_tmp = 0;
         uint8 idx=0;
        
+	os_printf("char recieve  !!! \r\n");
+	ProcessChar(CMD_DATA,&MessageUart);  
+
+	ProcessChar(0x1,&MessageUart);      
 	//Read each caractere from the register  
 	for(idx=0 ;idx < fifo_len ; idx++) {
 			// Process Input
@@ -32,7 +36,7 @@ void ICACHE_FLASH_ATTR uart_recvTask(os_event_t *events)
 
         }
 	
-
+	ProcessChar(E_END,&MessageUart);   
 
 	//Clear the register
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);
@@ -51,7 +55,7 @@ void ICACHE_FLASH_ATTR TCP_recvTask(os_event_t *events)
        uint8 fifo_len = (READ_PERI_REG(UART_STATUS(UART0))>>UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT;
         uint8 d_tmp = 0;
         uint8 idx=0;
-       
+
 	//Read each caractere from the register  
 	for(idx=0 ;idx < fifo_len ; idx++) {
 			// Process Input
@@ -62,6 +66,7 @@ void ICACHE_FLASH_ATTR TCP_recvTask(os_event_t *events)
 	    ProcessChar(d_tmp,&MessageUart);
 
         }
+
 
 	//Clear the register
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);

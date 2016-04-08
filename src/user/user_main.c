@@ -84,7 +84,7 @@ void user_init( void )
     wifi_station_connect();
    // wifi_set_event_handler_cb( wifi_callback );
 	shell_init();
-  //  user_set_station_config();
+   user_set_station_config();
 
 
 }

@@ -97,7 +97,23 @@ user_tcp_connect_cb(void *arg)
 
     espconn_regist_recvcb(pespconn, user_tcp_recv_cb);
     espconn_regist_sentcb(pespconn, user_tcp_sent_cb);
-  // espconn_regist_disconcb(pespconn, user_tcp_discon_cb);
+    espconn_regist_disconcb(pespconn, user_tcp_discon_cb);
+
+  espconn_set_opt(pespconn, 0x04); // enable write buffer
+  
+uint32_t keeplive;
+
+	espconn_set_opt(pespconn, ESPCONN_KEEPALIVE); // enable TCP keep alive
+
+	//set keepalive: 75s = 60 + 5*3
+	keeplive = 60*60;
+	espconn_set_keepalive(pespconn, ESPCONN_KEEPIDLE, &keeplive);
+	keeplive = 5;
+	espconn_set_keepalive(pespconn, ESPCONN_KEEPINTVL, &keeplive);
+	keeplive = 3; //try times
+	espconn_set_keepalive(pespconn, ESPCONN_KEEPCNT, &keeplive); 
+
+
    
     user_sent_data(pespconn);
 }
@@ -208,14 +224,20 @@ user_check_ip(void)
       user_tcp_conn.proto.tcp = &user_tcp;
       user_tcp_conn.type = ESPCONN_TCP;
       user_tcp_conn.state = ESPCONN_NONE;
-      
-#ifdef DNS_ENABLE
-      tcp_server_ip.addr = 0;
-       espconn_gethostbyname(&user_tcp_conn, NET_DOMAIN, &tcp_server_ip, user_dns_found); // DNS function
+  
+uint32_t keeplive;
 
-       os_timer_setfn(&test_timer, (os_timer_func_t *)user_dns_check_cb, &user_tcp_conn);
-       os_timer_arm(&test_timer, 1000, 0);
-#else
+	espconn_set_opt(&user_tcp_conn, ESPCONN_KEEPALIVE); // enable TCP keep alive
+
+	//set keepalive: 75s = 60 + 5*3
+	keeplive = 60*60;
+	espconn_set_keepalive(&user_tcp_conn, ESPCONN_KEEPIDLE, &keeplive);
+	keeplive = 5;
+	espconn_set_keepalive(&user_tcp_conn, ESPCONN_KEEPINTVL, &keeplive);
+	keeplive = 3; //try times
+	espconn_set_keepalive(&user_tcp_conn, ESPCONN_KEEPCNT, &keeplive); 
+
+
 
         const char esp_tcp_server_ip[4] = {192, 168, 1, 10}; // remote IP of TCP server
 
@@ -229,7 +251,6 @@ user_check_ip(void)
        espconn_regist_reconcb(&user_tcp_conn, user_tcp_recon_cb); // register reconnect callback as error handler
        espconn_connect(&user_tcp_conn);
 
-#endif
     }
    else
    {

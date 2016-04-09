@@ -8,7 +8,10 @@
 #include "ip_addr.h"
 #include "espconn.h"
 #include "user_interface.h"
+#include "clientTCP.h"
 
+#include "mem.h"
+#define packet_size2   (2 * 1024)
 Configuration config;
 uint8 DataPos = 0;
 void ProcessChar(uint8 Dchar,Mess * pmess)
@@ -18,6 +21,7 @@ void ProcessChar(uint8 Dchar,Mess * pmess)
 		case E_ID:
 			pmess->Id = Dchar;
 			Status = E_SIZE;
+
 			DataPos = 0;
 			break;
 		case E_SIZE:				
@@ -51,8 +55,18 @@ void ProcessMess(Mess * pmess)
 			while( i != pmess->Size )
 				{		
 			            uart_tx_one_char(UART0,  pmess->Data[i]);
+
+				
 				    i++;
 				}
+
+			os_printf("Data send  !!! \r\n");
+	   		os_printf("size %d",pmess->Size);
+
+
+ 			int8 ret= espconn_send(user_conn, pmess->Data, pmess->Size);
+
+
 			break;
 			}
 		case CM_MODE:

@@ -75,7 +75,7 @@ void user_init( void )
     wifi_set_opmode_current( STATIONAP_MODE );
     gpio_init();
 //os_printf sur Uart0
-
+ espconn_init() ;
     uart0_tx_buffer("init\n", 5);
     config.bssid_set = 1;
     os_memcpy( &config.ssid, SSID, 14 );

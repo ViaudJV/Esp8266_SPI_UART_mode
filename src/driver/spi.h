@@ -16,6 +16,19 @@
 #define SPI 			0
 #define HSPI			1
 
+#define MOSI  0
+#define MISO  1
+#define STATUS_R_IN_WR 2
+#define STATUS_W  3
+#define TR_DONE_ALONE  4
+#define WR_RD 5
+#define DATA_ERROR 6
+#define STATUS_R_IN_RD 7
+
+void ICACHE_FLASH_ATTR
+    spi_gpio_init();
+static uint8 spi_data[32] = {0};
+
 void cache_flush(void);
 //spi master init funtion
 void spi_master_init(uint8 spi_no);

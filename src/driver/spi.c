@@ -1,7 +1,7 @@
 
 #include "spi.h"
 #include "spi_overlap.h"
-
+#include "../user/task.h"
 #define CACHE_FLASH_CTRL_REG 0x3ff0000C
 #define CACHE_FLUSH_START_BIT BIT0
 #define CACHE_EMPTY_FLAG_BIT BIT1
@@ -159,7 +159,7 @@ void ICACHE_FLASH_ATTR
     if(spi_no>1)
         return; //handle invalid input number
     if(data_len<=1) data_bit_len=7;
-    else if(data_len>=32) data_bit_len=0xff;
+    else if(data_len>=SPI_BUFF) data_bit_len=0xff;
     else	data_bit_len=(data_len<<3)-1;
 
     //clear bit9,bit8 of reg PERIPHS_IO_MUX
@@ -278,7 +278,7 @@ void hspi_master_readwrite_repeat(void)
 #include "gpio.h"
 #include "user_interface.h"
 #include "mem.h"
-static uint8 spi_data[32] = {0};
+
 static uint8 idx = 0;
 static uint8 spi_flg = 0;
 #define SPI_MISO
@@ -296,7 +296,7 @@ os_event_t * spiQueue;
 //gpio0: wr_ready ,and  
 //gpio2: rd_ready , controlled by slave
 void ICACHE_FLASH_ATTR
-    gpio_init()
+    spi_gpio_init()
 {
 
     	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);
@@ -314,12 +314,24 @@ void spi_slave_isr_handler(void *para)
 	uint32 regvalue,calvalue;
     	static uint8 state =0;
 	uint32 recv_data,send_data;
+	static uint32 t1 =0; 
+	static uint32 t2 =0; 
+	t1=system_get_time(); 
+
+    	os_printf("SPI Isr HSPI = %d !!! \r\n",READ_PERI_REG(0x3ff00020)&BIT7);
+    	os_printf("SPI Isr SPI = %d !!! \r\n",READ_PERI_REG(0x3ff00020)&BIT4);
+
 
 	if(READ_PERI_REG(0x3ff00020)&BIT4){		
         //following 3 lines is to clear isr signal
         	CLEAR_PERI_REG_MASK(SPI_SLAVE(SPI), 0x3ff);
     	}else if(READ_PERI_REG(0x3ff00020)&BIT7){ //bit7 is for hspi isr,
+
         	regvalue=READ_PERI_REG(SPI_SLAVE(HSPI));
+
+    		os_printf("SPI Isr BUFF done = %b !!! \r\n",regvalue);
+    		os_printf("SPI Isr WR BUFF done = %d !!! \r\n",regvalue&SPI_SLV_WR_BUF_DONE);
+    		os_printf("SPI Isr RD BUFF done = %d !!! \r\n",regvalue&SPI_SLV_RD_BUF_DONE);
          	CLEAR_PERI_REG_MASK(SPI_SLAVE(HSPI),  
 								SPI_TRANS_DONE_EN|
 								SPI_SLV_WR_STA_DONE_EN|
@@ -339,26 +351,33 @@ void spi_slave_isr_handler(void *para)
 								SPI_SLV_RD_STA_DONE_EN|
 								SPI_SLV_WR_BUF_DONE_EN|
 								SPI_SLV_RD_BUF_DONE_EN);
-
+	
 		if(regvalue&SPI_SLV_WR_BUF_DONE){ 
             		GPIO_OUTPUT_SET(0, 0);
+
+    			os_printf("WR Buf,Done.  !!! \r\n");
             		idx=0;
+			spi_dataCom = (uint8*)os_malloc(sizeof(uint8)*32);
             		while(idx<8){
+				
             			recv_data=READ_PERI_REG(SPI_W0(HSPI)+(idx<<2));
-            			spi_data[idx<<2] = recv_data&0xff;
-            			spi_data[(idx<<2)+1] = (recv_data>>8)&0xff;
-            			spi_data[(idx<<2)+2] = (recv_data>>16)&0xff;
-            			spi_data[(idx<<2)+3] = (recv_data>>24)&0xff;
+            			spi_dataCom[idx<<2] = recv_data&0xff;
+            			spi_dataCom[(idx<<2)+1] = (recv_data>>8)&0xff;
+            			spi_dataCom[(idx<<2)+2] = (recv_data>>16)&0xff;
+            			spi_dataCom[(idx<<2)+3] = (recv_data>>24)&0xff;
             			idx++;
+
 			}
 			//add system_os_post here
             		GPIO_OUTPUT_SET(0, 1);
+			system_os_post(PRIO_SPI,MISO_EVENT,0);
 		}
         	if(regvalue&SPI_SLV_RD_BUF_DONE){
 			//it is necessary to call GPIO_OUTPUT_SET(2, 1), when new data is preped in SPI_W8-15 and needs to be sended.
            		GPIO_OUTPUT_SET(2, 0);
 			//add system_os_post here
-			//system_os_post(USER_TASK_PRIO_1,WR_RD,regvalue);
+			
+    			os_printf("RD Buf,Done.  !!! \r\n");;
 
         	}
     

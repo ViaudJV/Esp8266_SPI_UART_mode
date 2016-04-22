@@ -30,8 +30,13 @@ typedef struct mess
 	uint8 Id;
 	uint8 Size;
 	uint8 Data[256];
+	MessState Status;
+	uint8 DataPos ;
 }Mess;
+
 Mess MessageUart;
+Mess MessageSPi;
+Mess MessageTCP;
 #define DATA_SIZE_MAX 0xFF
 
 //CMD Data 

@@ -39,7 +39,6 @@ LOCAL struct UartBuffer* pRxBuffer = NULL;
 /*it might conflict with your task, if so,please arrange the priority of different task,  or combine it to a different event in the same task. */
 #define uart_recvTaskPrio        0
 #define uart_recvTaskQueueLen    10
-os_event_t    uart_recvTaskQueue[uart_recvTaskQueueLen];
 
 #define DBG  
 #define DBG1 uart1_sendStr_no_wait
@@ -239,12 +238,12 @@ uart0_rx_intr_handler(void *para)
         DBG("f");
         uart_rx_intr_disable(UART0);
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR);
-        system_os_post(uart_recvTaskPrio, 0, 0);
+        system_os_post(PRIO_UART, 0, 0);
     }else if(UART_RXFIFO_TOUT_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_RXFIFO_TOUT_INT_ST)){
         DBG("t");
         uart_rx_intr_disable(UART0);
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_TOUT_INT_CLR);
-        system_os_post(uart_recvTaskPrio, 0, 0);
+        system_os_post(PRIO_UART, 0, 0);
     }else if(UART_TXFIFO_EMPTY_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_TXFIFO_EMPTY_INT_ST)){
         DBG("e");
 	/* to output uart data from uart buffer directly in empty interrupt handler*/
@@ -256,7 +255,7 @@ uart0_rx_intr_handler(void *para)
 	#if UART_BUFF_EN
 		tx_start_uart_buffer(UART0);
 	#endif
-        //system_os_post(uart_recvTaskPrio, 1, 0);
+        //system_os_post(PRIO_UART, 1, 0);
         WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_TXFIFO_EMPTY_INT_CLR);
         
     }else if(UART_RXFIFO_OVF_INT_ST  == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_RXFIFO_OVF_INT_ST)){
@@ -329,7 +328,7 @@ void ICACHE_FLASH_ATTR
 uart_init(UartBautRate uart0_br, UartBautRate uart1_br)
 {
     /*this is a example to process uart data from task,please change the priority to fit your application task if exists*/
-    system_os_task(uart_recvTask, uart_recvTaskPrio, uart_recvTaskQueue, uart_recvTaskQueueLen);  //demo with a task to process the uart data
+   // system_os_task(uart_recvTask, uart_recvTaskPrio, uart_recvTaskQueue, uart_recvTaskQueueLen);  //demo with a task to process the uart data
 
     UartDev.baut_rate = uart0_br;
     uart_config(UART0);

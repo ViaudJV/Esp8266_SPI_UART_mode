@@ -13,31 +13,32 @@
 #include "mem.h"
 #define packet_size2   (2 * 1024)
 Configuration config;
-uint8 DataPos = 0;
+
 void ProcessChar(uint8 Dchar,Mess * pmess)
 {
-	switch(Status)
+	switch(pmess->Status)
 	{
 		case E_ID:
 			pmess->Id = Dchar;
-			Status = E_SIZE;
+			pmess->Status = E_SIZE;
 
-			DataPos = 0;
+			pmess->DataPos = 0;
 			break;
 		case E_SIZE:				
 			pmess->Size = Dchar;
-			Status = E_DATA;
+			pmess->Status = E_DATA;
 			break;
 		case E_DATA:
-			pmess->Data[DataPos] = Dchar;
-                        DataPos ++;
-			if( DataPos & pmess->Size)
+			pmess->Data[pmess->DataPos] = Dchar;
+                        
+				pmess->DataPos ++;
+			if( pmess->DataPos == pmess->Size)
 			{
-				break;
+				ProcessMess(pmess);
+				pmess->Status = E_ID;
+				pmess->DataPos = 0;
 			}
-		case E_END:
-			ProcessMess(pmess);
-			Status = E_ID;
+			break;
 		default:
 			break;
 	}
@@ -51,17 +52,17 @@ void ProcessMess(Mess * pmess)
 	{
 		case CMD_DATA:
 			{
-			uint8 i = 0;
-			while( i != pmess->Size )
-				{		
-			            uart_tx_one_char(UART0,  pmess->Data[i]);
 
-				
-				    i++;
-				}
+			os_printf("CMD_DATA  !!! \r\n");
+
+	   		os_printf(" pmess->size %d \r\n", pmess->Size);
+	   		os_printf(" pmess->Data[0] %d \r\n", pmess->Data[0]);
+	   		os_printf(" pmess->Data[1] %d \r\n", pmess->Data[1]);
+	   		os_printf(" pmess->Data[2] %d \r\n", pmess->Data[2]);
+	   		os_printf(" pmess->Data[3] %d \r\n", pmess->Data[3]);
+
 
 			os_printf("Data send  !!! \r\n");
-	   		os_printf("size %d",pmess->Size);
 
 
  			int8 ret= espconn_send(user_conn, pmess->Data, pmess->Size);

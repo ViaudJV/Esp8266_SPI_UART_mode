@@ -1,6 +1,10 @@
 #include <SPI.h>
 int ss=10; // using digital pin 10 for SPI slave select
 int del=200; // used for various delays
+
+
+#define CMD_WRITE 0100 
+#define CMD_READ 0110 
  
 void setup()
 {
@@ -13,7 +17,7 @@ void setup()
 void setValue(int value)
 {
   digitalWrite(ss, LOW);
-  SPI.transfer(0); // send command byte
+  SPI.transfer(CMD_WRITE); // send command byte
   SPI.transfer(value); // send value (0~255)
   digitalWrite(ss, HIGH);
 }

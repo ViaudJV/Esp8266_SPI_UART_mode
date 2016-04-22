@@ -9,6 +9,8 @@
 #include "../driver/uart.h"
 #include "../driver/spi.h"
 #include "serverTCP.h"
+#include "task.h"
+
 
 void uart0_rx_intr_handler(void *para)
 {
@@ -70,10 +72,11 @@ void user_init( void )
     uart_div_modify( 0, UART_CLK_FREQ / ( 115200 ) );
     os_printf( "%s\n", __FUNCTION__ );
     uart_init(115200,9600);
-    spi_slave_init(HSPI,32);
+    spi_slave_init(HSPI,SPI_BUFF);
     wifi_station_set_hostname( HOSTNAME );
     wifi_set_opmode_current( STATIONAP_MODE );
     gpio_init();
+    spi_gpio_init();
 //os_printf sur Uart0
  espconn_init() ;
     uart0_tx_buffer("init\n", 5);
@@ -83,8 +86,12 @@ void user_init( void )
     wifi_station_set_config( &config );
     wifi_station_connect();
    // wifi_set_event_handler_cb( wifi_callback );
-	shell_init();
+   shell_init();
    user_set_station_config();
+
+
+    system_os_task(all_recvTask,PRIO_SPI,  all_recvTaskQueue, TASK_LENGHT);  ///demo with a task to process the uart data
+    system_os_task(uart_recvTask,PRIO_UART,  uart_recvTaskQueue, TASK_LENGHT); // //demo with a task to process the spi 
 
 
 }

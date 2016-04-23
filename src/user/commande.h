@@ -72,7 +72,8 @@ Mess MessageTCP;
 #define CM_UDPPORT	0x41  //Donnée du port sur 2 octets
 
 
-#define CM_RST		0xFF
+#define CM_RST		0xF0
+#define CM_NOCMD	0xFF
 
 
 void ProcessChar(uint8 Dchar,Mess *pmess);

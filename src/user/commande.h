@@ -40,7 +40,7 @@ Mess MessageTCP;
 #define DATA_SIZE_MAX 0xFF
 
 //CMD Data 
-#define CMD_DATA	 0x00 //Donnees Transmisent avec une taille MAX de 256
+#define CMD_DATA	 0xF1 //Donnees Transmisent avec une taille MAX de 256
 
 // CMD Definit dans le mode de la puce (STATION OU/ET AP) 
 #define CM_MODE	 0x01

@@ -14,6 +14,7 @@
 
 #include "task.h"
 
+
 extern uint8 spi_data[32];
 void ICACHE_FLASH_ATTR uart_recvTask(os_event_t *events)
 {
@@ -87,8 +88,7 @@ void ICACHE_FLASH_ATTR all_recvTask(os_event_t *events)
 {
     int idx;
 
-    Mess MessageSPi;
-	MessageSPi.Status = E_ID;
+	
     os_printf("EVENT All recvTask  !!! \r\n");
     os_printf("id 0 %d  !!! \r\n",spi_dataCom[0]);
     os_printf("id 1 %d  !!! \r\n",spi_dataCom[1]);

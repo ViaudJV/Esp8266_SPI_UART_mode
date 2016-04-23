@@ -10,6 +10,7 @@
 #include "../driver/spi.h"
 #include "serverTCP.h"
 #include "task.h"
+#include "commande.h"
 
 
 void uart0_rx_intr_handler(void *para)
@@ -89,7 +90,7 @@ void user_init( void )
    shell_init();
    user_set_station_config();
 
-
+ MessageSPi.Status = E_ID;
     system_os_task(all_recvTask,PRIO_SPI,  all_recvTaskQueue, TASK_LENGHT);  ///demo with a task to process the uart data
     system_os_task(uart_recvTask,PRIO_UART,  uart_recvTaskQueue, TASK_LENGHT); // //demo with a task to process the spi 
 

@@ -13,7 +13,6 @@
 #define MISO_EVENT 0
 #define TCP_EVENT 1
 
-
 	uint8 * spi_dataCom;
 os_event_t    uart_recvTaskQueue[TASK_LENGHT];
 os_event_t    all_recvTaskQueue[TASK_LENGHT];

@@ -19,10 +19,14 @@ void ProcessChar(uint8 Dchar,Mess * pmess)
 	switch(pmess->Status)
 	{
 		case E_ID:
-			pmess->Id = Dchar;
-			pmess->Status = E_SIZE;
+			if(Dchar > 0)
+			{
+				pmess->Id = Dchar;
+				pmess->Status = E_SIZE;
 
-			pmess->DataPos = 0;
+				os_printf("NEW CMD  !!! \r\n");
+				pmess->DataPos = 0;
+			}
 			break;
 		case E_SIZE:				
 			pmess->Size = Dchar;
@@ -64,8 +68,10 @@ void ProcessMess(Mess * pmess)
 
 			os_printf("Data send  !!! \r\n");
 
-
- 			int8 ret= espconn_send(user_conn, pmess->Data, pmess->Size);
+			if( pmess->Size!= 0)
+			{
+ 				int8 ret= espconn_send(user_conn, pmess->Data, pmess->Size);
+			}
 
 
 			break;

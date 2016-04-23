@@ -319,7 +319,6 @@ void spi_slave_isr_handler(void *para)
 	t1=system_get_time(); 
 
     	os_printf("SPI Isr HSPI = %d !!! \r\n",READ_PERI_REG(0x3ff00020)&BIT7);
-    	os_printf("SPI Isr SPI = %d !!! \r\n",READ_PERI_REG(0x3ff00020)&BIT4);
 
 
 	if(READ_PERI_REG(0x3ff00020)&BIT4){		
@@ -329,7 +328,6 @@ void spi_slave_isr_handler(void *para)
 
         	regvalue=READ_PERI_REG(SPI_SLAVE(HSPI));
 
-    		os_printf("SPI Isr BUFF done = %b !!! \r\n",regvalue);
     		os_printf("SPI Isr WR BUFF done = %d !!! \r\n",regvalue&SPI_SLV_WR_BUF_DONE);
     		os_printf("SPI Isr RD BUFF done = %d !!! \r\n",regvalue&SPI_SLV_RD_BUF_DONE);
          	CLEAR_PERI_REG_MASK(SPI_SLAVE(HSPI),  
@@ -355,9 +353,8 @@ void spi_slave_isr_handler(void *para)
 		if(regvalue&SPI_SLV_WR_BUF_DONE){ 
             		GPIO_OUTPUT_SET(0, 0);
 
-    			os_printf("WR Buf,Done.  !!! \r\n");
             		idx=0;
-			spi_dataCom = (uint8*)os_malloc(sizeof(uint8)*32);
+			spi_dataCom = (uint8*)os_malloc(sizeof(uint8)*SPI_BUFF);
             		while(idx<8){
 				
             			recv_data=READ_PERI_REG(SPI_W0(HSPI)+(idx<<2));

@@ -2,16 +2,15 @@
 #define COMMANDE_H
 
 #include "os_type.h"
-uint8 BufferInput[128];
 typedef struct configuration
 {
-	uint8 StaSsid[64];
-	uint8 StaPwd[64];
-	uint8 APSsid[64];
-	uint8 APPwd[64];
-	uint16 TCPPort;
- 	uint16 UDPPort;
-	uint8 USE;
+	uint8_t StaSsid[64];
+	uint8_t StaPwd[64];
+	uint8_t APSsid[64];
+	uint8_t APPwd[64];
+	uint16_t TCPPort;
+ 	uint16_t UDPPort;
+	uint8_t USE;
 } Configuration;
 
 typedef enum messstate
@@ -27,15 +26,15 @@ MessState Status;
 
 typedef struct mess
 {
-	uint8 Id;
-	uint8 Size;
-	uint8 Data[256];
+	uint8_t Id;
+	uint8_t Size;
+	uint8_t Data[256];
 	MessState Status;
-	uint8 DataPos ;
+	uint8_t DataPos ;
 }Mess;
 
 Mess MessageUart;
-Mess MessageSPi;
+static Mess MessageSPi;
 Mess MessageTCP;
 #define DATA_SIZE_MAX 0xFF
 
@@ -76,7 +75,7 @@ Mess MessageTCP;
 #define CM_NOCMD	0xFF
 
 
-void ProcessChar(uint8 Dchar,Mess *pmess);
+void ProcessChar(uint8_t Dchar,Mess *pmess);
 
 void ProcessMess(Mess *pmess);
 

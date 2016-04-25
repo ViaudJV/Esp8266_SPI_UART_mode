@@ -279,7 +279,6 @@ void hspi_master_readwrite_repeat(void)
 #include "user_interface.h"
 #include "mem.h"
 
-static uint8 idx = 0;
 static uint8 spi_flg = 0;
 #define SPI_MISO
 #define SPI_QUEUE_LEN 8
@@ -317,8 +316,8 @@ void spi_slave_isr_handler(void *para)
 	static uint32 t1 =0; 
 	static uint32 t2 =0; 
 	t1=system_get_time(); 
-
-    	os_printf("SPI Isr HSPI = %d !!! \r\n",READ_PERI_REG(0x3ff00020)&BIT7);
+	int idx = 0;
+    //	os_printf("SPI Isr HSPI = %d !!! \r\n",READ_PERI_REG(0x3ff00020)&BIT7);
 
 
 	if(READ_PERI_REG(0x3ff00020)&BIT4){		
@@ -328,8 +327,8 @@ void spi_slave_isr_handler(void *para)
 
         	regvalue=READ_PERI_REG(SPI_SLAVE(HSPI));
 
-    		os_printf("SPI Isr WR BUFF done = %d !!! \r\n",regvalue&SPI_SLV_WR_BUF_DONE);
-    		os_printf("SPI Isr RD BUFF done = %d !!! \r\n",regvalue&SPI_SLV_RD_BUF_DONE);
+  //  		os_printf("SPI Isr WR BUFF done = %d !!! \r\n",regvalue&SPI_SLV_WR_BUF_DONE);
+ //   		os_printf("SPI Isr RD BUFF done = %d !!! \r\n",regvalue&SPI_SLV_RD_BUF_DONE);
          	CLEAR_PERI_REG_MASK(SPI_SLAVE(HSPI),  
 								SPI_TRANS_DONE_EN|
 								SPI_SLV_WR_STA_DONE_EN|
@@ -354,20 +353,30 @@ void spi_slave_isr_handler(void *para)
             		GPIO_OUTPUT_SET(0, 0);
 
             		idx=0;
-			spi_dataCom = (uint8*)os_malloc(sizeof(uint8)*SPI_BUFF);
-            		while(idx<8){
+			if(positiondebut != positionfin)
+			{
+				uint8 * spi_dataCom = DataSPIBuf[positionfin];
+				while(idx<8){
 				
-            			recv_data=READ_PERI_REG(SPI_W0(HSPI)+(idx<<2));
-            			spi_dataCom[idx<<2] = recv_data&0xff;
-            			spi_dataCom[(idx<<2)+1] = (recv_data>>8)&0xff;
-            			spi_dataCom[(idx<<2)+2] = (recv_data>>16)&0xff;
-            			spi_dataCom[(idx<<2)+3] = (recv_data>>24)&0xff;
-            			idx++;
+		    			recv_data=READ_PERI_REG(SPI_W0(HSPI)+(idx<<2));
+		    			spi_dataCom[idx<<2] = recv_data&0xff;
+		    			spi_dataCom[(idx<<2)+1] = (recv_data>>8)&0xff;
+		    			spi_dataCom[(idx<<2)+2] = (recv_data>>16)&0xff;
+		    			spi_dataCom[(idx<<2)+3] = (recv_data>>24)&0xff;
+		    			idx++;
 
+				}
+				//add system_os_post here
+				positionfin++;
+				positionfin = positionfin%SPI_BUFF;
+				system_os_post(PRIO_SPI,MISO_EVENT, 0);
 			}
-			//add system_os_post here
+			else
+			{
+
+    				os_printf("Drop.  !!! \r\n");;
+			}
             		GPIO_OUTPUT_SET(0, 1);
-			system_os_post(PRIO_SPI,MISO_EVENT,0);
 		}
         	if(regvalue&SPI_SLV_RD_BUF_DONE){
 			//it is necessary to call GPIO_OUTPUT_SET(2, 1), when new data is preped in SPI_W8-15 and needs to be sended.
@@ -384,97 +393,5 @@ void spi_slave_isr_handler(void *para)
 }
 
 
-#ifdef SPI_SLAVE_DEBUG
-
-void ICACHE_FLASH_ATTR
-    set_miso_data()
-{
-    if(GPIO_INPUT_GET(2)==0){
-        WRITE_PERI_REG(SPI_W8(HSPI),0x05040302);
-        WRITE_PERI_REG(SPI_W9(HSPI),0x09080706);
-        WRITE_PERI_REG(SPI_W10(HSPI),0x0d0c0b0a);
-        WRITE_PERI_REG(SPI_W11(HSPI),0x11100f0e);
-
-        WRITE_PERI_REG(SPI_W12(HSPI),0x15141312);
-        WRITE_PERI_REG(SPI_W13(HSPI),0x19181716);
-        WRITE_PERI_REG(SPI_W14(HSPI),0x1d1c1b1a);
-        WRITE_PERI_REG(SPI_W15(HSPI),0x21201f1e);
-        GPIO_OUTPUT_SET(2, 1);
-    }
-}
-
-
-
-void ICACHE_FLASH_ATTR
-    disp_spi_data()
-{
-    uint8 i = 0;
-    for(i=0;i<32;i++){
-        os_printf("data %d : 0x%02x\n\r",i,spi_data[i]);
-    }
-    //os_printf("d31:0x%02x\n\r",spi_data[31]);
-}
-
-
-void ICACHE_FLASH_ATTR
-    spi_task(os_event_t *e)
-{
-    uint8 data;
-    switch(e->sig){
-       case MOSI:
-            	disp_spi_data();
-            	break;
-	case STATUS_R_IN_WR :
-		os_printf("SR ERR in WRPR,Reg:%08x \n",e->par);
-		break;
-	case STATUS_W:
-		os_printf("SW ERR,Reg:%08x\n",e->par);
-		break;	
-	case TR_DONE_ALONE:
-		os_printf("TD ALO ERR,Reg:%08x\n",e->par);
-		break;	
-	case WR_RD:
-		os_printf("WR&RD ERR,Reg:%08x\n",e->par);
-		break;	
-	case DATA_ERROR:
-		os_printf("Data ERR,Reg:%08x\n",e->par);
-		break;
-	case STATUS_R_IN_RD :
-		os_printf("SR ERR in RDPR,Reg:%08x\n",e->par);
-		break;	
-        default:
-            break;
-    }
-}
-
-void ICACHE_FLASH_ATTR
-    spi_task_init(void)
-{
-    spiQueue = (os_event_t*)os_malloc(sizeof(os_event_t)*SPI_QUEUE_LEN);
-    system_os_task(spi_task,USER_TASK_PRIO_1,spiQueue,SPI_QUEUE_LEN);
-}
-
-os_timer_t spi_timer_test;
-
-void ICACHE_FLASH_ATTR
-    spi_test_init()
-{
-    os_printf("spi init\n\r");
-    spi_slave_init(HSPI);
-    os_printf("gpio init\n\r");
-    gpio_init();
-    os_printf("spi task init \n\r");
-    spi_task_init();
-#ifdef SPI_MISO
-    os_printf("spi miso init\n\r");
-    set_miso_data();
-#endif
-    
-    //os_timer_disarm(&spi_timer_test);
-    //os_timer_setfn(&spi_timer_test, (os_timer_func_t *)set_miso_data, NULL);//wjl
-    //os_timer_arm(&spi_timer_test,50,1);
-}
-
-#endif
 
 

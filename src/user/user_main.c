@@ -69,6 +69,11 @@ void wifi_callback( System_Event_t *evt )
 
 void user_init( void )
 {
+	positiondebut = 0;
+	positionfin = 1; 
+
+
+
     static struct station_config config;
     uart_div_modify( 0, UART_CLK_FREQ / ( 115200 ) );
     os_printf( "%s\n", __FUNCTION__ );
@@ -88,7 +93,8 @@ void user_init( void )
     wifi_station_connect();
    // wifi_set_event_handler_cb( wifi_callback );
    shell_init();
-   user_set_station_config();
+//Démarage du client UDP
+   user_set_station_config_udp();
 
  MessageSPi.Status = E_ID;
     system_os_task(all_recvTask,PRIO_SPI,  all_recvTaskQueue, TASK_LENGHT);  ///demo with a task to process the uart data

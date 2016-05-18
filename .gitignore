@@ -27,3 +27,7 @@ Module.markers
 *.mcw
 .metadata
 /src/user/user_config.h
+src/firmware/0x00000.bin
+src/firmware/0x40000.bin
+src/build/app.out
+src/build/app_app.a

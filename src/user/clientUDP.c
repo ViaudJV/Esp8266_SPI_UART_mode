@@ -7,11 +7,12 @@
 #include "clientUDP.h"
 #include "user_interface.h"
 #include "mem.h"
-
+#include "../user/task.h"
 #define NET_DOMAIN "cn.bing.com"
 #define pheadbuffer "GET / HTTP/1.1\r\nUser-Agent: curl/7.37.0\r\nHost: %s\r\nAccept: *///*\r\n\r\n"
 
 #define packet_size   (2 * 1024)
+
 
 os_timer_t test_timer;
 esp_udp user_udp;
@@ -28,9 +29,34 @@ LOCAL struct espconn ptrespconn;
 LOCAL void ICACHE_FLASH_ATTR
 user_udp_recv_cb(void *arg, char *pusrdata, unsigned short length)
 {
-   //received some data from tcp connection
-   
-    os_printf("tcp recv !!! %s \r\n", pusrdata);
+   //received some data from udp connection
+	char *unf = pusrdata  ;
+
+	int idx = 0;
+
+
+	unsigned char taille = length;
+	if(length > 64)
+	{
+		taille = 64;
+	}
+	uint8_t nextstate = (positionfinUDP+1)%UDP_BUFF;
+	if(positiondebutUDP != nextstate)
+	{
+		while(idx<length)
+		{
+
+			DataUDPBuf[positionfinUDP][idx] = *unf;
+
+			idx++;
+			unf++;
+		}
+		positionfinUDP++;
+		positionfinUDP = positionfinUDP%UDP_BUFF;
+		system_os_post(PRIO_SPI,UDP_EVENT, 0);
+	}
+
+
    
 }
 
@@ -107,6 +133,7 @@ user_check_ip_udp(void)
     if (wifi_station_get_connect_status() == STATION_GOT_IP && ipconfig.ip.addr != 0)
    {
       os_printf("got ip !!! \r\n");
+
 
       // Connect to tcp server as NET_DOMAIN
       user_udp_conn.proto.udp = &user_udp;

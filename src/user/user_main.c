@@ -73,6 +73,8 @@ void user_init( void )
 	positionfin = 1; 
 
 
+	positiondebutUDP = 0;
+	positionfinUDP = 0;
 
     static struct station_config config;
     uart_div_modify( 0, UART_CLK_FREQ / ( 115200 ) );
@@ -96,6 +98,7 @@ void user_init( void )
 //Démarage du client UDP
    user_set_station_config_udp();
 
+   MessageUDP.Status = E_ID;
  MessageSPi.Status = E_ID;
     system_os_task(all_recvTask,PRIO_SPI,  all_recvTaskQueue, TASK_LENGHT);  ///demo with a task to process the uart data
     system_os_task(uart_recvTask,PRIO_UART,  uart_recvTaskQueue, TASK_LENGHT); // //demo with a task to process the spi 

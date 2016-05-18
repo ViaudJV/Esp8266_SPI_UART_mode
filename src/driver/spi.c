@@ -374,7 +374,7 @@ void spi_slave_isr_handler(void *para)
 			else
 			{
 
-    				os_printf("Drop.  !!! \r\n");;
+    				os_printf("Drop.  !!! \r\n");
 			}
             		GPIO_OUTPUT_SET(0, 1);
 		}

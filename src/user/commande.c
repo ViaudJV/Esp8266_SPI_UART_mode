@@ -8,8 +8,8 @@
 #include "ip_addr.h"
 #include "espconn.h"
 #include "user_interface.h"
-#include "clientTCP.h"
 #include "clientUDP.h"
+#include "user_interface.h"
 
 #include "mem.h"
 Configuration config;
@@ -23,7 +23,6 @@ void ProcessChar(uint8_t Dchar,Mess * pmess)
 			{
 				pmess->Id = Dchar;
 				pmess->Status = E_SIZE;
-
 				pmess->DataPos = 0;
 			}
 			break;
@@ -49,7 +48,8 @@ void ProcessChar(uint8_t Dchar,Mess * pmess)
 
 void ProcessMess(Mess * pmess)
 {
-	 
+	os_printf("Process message  !!! \r\n");
+
 	switch(pmess->Id)
 	{
 		case CMD_DATA:
@@ -74,8 +74,24 @@ void ProcessMess(Mess * pmess)
 			}
 		case CM_MODE:
 			{
-				if(  pmess->Data[0] <= 0x03)
-					wifi_set_opmode( pmess->Data[0]);
+
+				wifi_station_disconnect();
+				wifi_set_opmode( pmess->Data[0]);
+
+				if(  pmess->Data[0] == 0x02)
+				{
+
+				}
+				if(  pmess->Data[0] == 0x03 ||  pmess->Data[0] == 0x01 )
+				{
+				    static struct station_config config;
+						config.bssid_set = 1;
+					    os_memcpy( &config.ssid, SSID, 14 );
+					    os_memcpy( &config.password, PASSWORD, 41);
+					    wifi_station_set_config( &config );
+				}
+
+			    wifi_station_connect();
 				break;
 			}
 		case CM_STASSID:
@@ -172,14 +188,24 @@ void ProcessMess(Mess * pmess)
 					config.USE = 0x01;
 					if( pmess->Data[0])
 					{
-					
+
 					}
 					config.USE = 0x00;
-				} 
+				}
 				break;
 			}
-		case CM_UDPEN:
+		case CM_UDPEN:			{
+			if(!config.USE)
+			{
+				config.USE = 0x01;
+				if( pmess->Data[0])
+				{
+
+				}
+				config.USE = 0x00;
+			}
 			break;
+		}
 		case CM_UDPPORT:
 			{			
 				if(!config.USE)
@@ -199,9 +225,19 @@ void ProcessMess(Mess * pmess)
 					config.TCPPort = 0;
 					config.TCPPort = (uint16)( pmess->Data[0]) + ((uint16) pmess->Data[1])<<8;
 					config.USE = 0x00;
-				} 
+				}
 			break;
 			}
+		case CM_RST:
+			{
+				os_printf("Resart  !!! \r\n");
+				system_restart();
+			break;
+			}
+
+
+
+
 		default:
 			//Do nothing
 			break;

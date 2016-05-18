@@ -34,8 +34,8 @@ typedef struct mess
 }Mess;
 
 Mess MessageUart;
-static Mess MessageSPi;
-Mess MessageTCP;
+Mess MessageSPi;
+Mess MessageUDP;
 #define DATA_SIZE_MAX 0xFF
 
 //CMD Data 
